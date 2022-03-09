@@ -25,7 +25,7 @@ Note: For these examples, replace `API_KEY` and `NEW_API_KEY` with the actual ap
 ```JavaScript
 
 const XBL = require("xbl.io");
-var client = XBL.Client();
+var client = new 7XBL.Client();
 
 
 
@@ -50,7 +50,7 @@ client.login(NEW_API_KEY, (account) => {
 	console.log(account.settings.Gamertag)
 })
 
-OR
+
 
 await client.login(NEW_API_KEY)
 console.log(client.settings.Gamertag)
@@ -58,13 +58,36 @@ console.log(client.settings.Gamertag)
 
 <br>
 
-## Client Functions
+## Properties
 
-### account 
+### account
 ```JavaScript
-await client.account(optional:XUID);
+// Object
+client.account
+```
+The most recent cache save of the client's account
+
+### accounts
+```JavaScript
+// Array<Object>
+client.accounts
+```
+The cache of all accounts recently fetched (saves up to 10 non-repetitive accounts not including the client's account with newer cached items first)
+
+
+## Methods
+
+### getAccount 
+```JavaScript
+await client.getAccount(optional:XUID);
 ```
 Grabs the account of the XUID specified, if no XUID is specified, uses the currently logged in account's XUID.
+
+### getAccounts
+```JavaScript
+await client.getAccounts(required:XUIDs)
+```
+Iterates throught the inputted `Array` and returns an array of the accounts of all the xuids inputted.
 
 ### friends 
 ```JavaScript
