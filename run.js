@@ -2,10 +2,10 @@ const api = require('./index.js');
 
 (async() => {
 
-	var client = api.Client();
+	var client = new api.Client();
 
 	client.login(process.env.TEST_API_KEY, (account) => {
-		console.log(account)
+		console.log(client)
 	})
 	
 })();

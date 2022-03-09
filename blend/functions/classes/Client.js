@@ -1,7 +1,5 @@
 const fetch = require('node-fetch')
 
-const client = require('./classes/Client.js')
-
 const cb = (callback, p1, p2, p3) => {
 	if(callback === undefined) return p1
 	try {callback(p1, p2, p3);return p1} catch(err) {throw err}
@@ -43,72 +41,82 @@ const handle = async (res, returnInsteadOfError) => {
 	return returnData
 }
 
-function Client() {
-	var client = {}
-	client.XAuth = null
+class XBL_Client {
+	#XAuth = null
 	
-	var fetchData = (method, body) => {
+	constructor() {
+		this.#XAuth = null
+		this.account = null
+	};
+
+	fetchData(method, body) {
 		return {
 			method: method ? method.toUpperCase() : 'GET',
 			headers: {
-				'X-Authorization': client.XAuth ? client.XAuth : ''
+				'X-Authorization': this.#XAuth ? this.#XAuth : ''
 			},
 			body
-		}
-	}
+		};
+	};
 
-	client.login = async function(XAuth, callback) {
-		XAuthStore = client.XAuth
-		client.XAuth = XAuth
+	async login(XAuth, callback) {
+		var XAuthStore = this.#XAuth
+		this.#XAuth = XAuth
 
-		var account = await fetch(`https://xbl.io/api/v2/account`, fetchData()).then(async res => {return await handle(res, true)})
+		var account = await fetch(`https://xbl.io/api/v2/account`, this.fetchData()).then(async res => {return await handle(res, true)})
 		
 		if(account === 'Invalid API Key') {
-			client.XAuth = XAuthStore
+			this.XAuth = XAuthStore
 			throw 'XBL.IO ERROR: Invalid API Key'
 		}
+
+		this.account = account
 
 		return cb(callback, account)
 	}
 
-	client.account = async function(xuid) {
-		return await fetch(`https://xbl.io/api/v2/account${xuid ? `/${xuid}` : ''}`, fetchData()).then(async res => {return await handle(res)})
+	async account(xuid) {
+		var account = await fetch(`https://xbl.io/api/v2/account${xuid ? `/${xuid}` : ''}`, this.fetchData()).then(async res => {return await handle(res)})
+		if(xuid === this.account.id || xuid === undefined) {
+			this.account = account
+		}
+		return account
 	}
 
-	client.friends = async function(xuid) {
+	async friends(xuid) {
 		return await fetch(`https://xbl.io/api/v2/friends${xuid ?  `?xuid=${xuid}` : ''}`, fetchData()).then(async res => {return await handle(res)})
 	}
 
-	client.userFetch = async function(gt) {
+	async userFetch(gt) {
 		if(!gt) {throw 'XBL.IO ERROR: Must have GamerTag input on User Search'}
 		return await fetch(`https://xbl.io/api/v2/friends/search?gt=${gt}`, fetchData()).then(async res => {return await handle(res)})
 	}
 
-	client.friendAdd = async function(xuid) {
+	async friendAdd(xuid) {
 		if(!xuid) {throw 'XBL.IO ERROR: Must include a User XUID to add a friend.'}
 
 		return await fetch(`https://xbl.io/api/v2/friends/add/${xuid}`, fetchData()).then(async res => {return await handle(res)})
 	}
 
-	client.friendRemove = async function(xuid) {
+	async friendRemove(xuid) {
 		if(!xuid) {throw 'XBL.IO ERROR: Must include a Friend XUID to remove a friend.'}
 
 		return await fetch(`https://xbl.io/api/v2/friends/remove/${xuid}`, fetchData()).then(async res => {return await handle(res)})
 	}
 
-	client.favoriteAdd = async function(xuid) {
+	async favoriteAdd(xuid) {
 		if(!xuid) {throw 'XBL.IO ERROR: Must have include an xuid to add as a favorite.'}
 
 		return await fetch(`https://xbl.io/api/v2/friends/favorite`, fetchData('post', {"xuids":[parseInt(xuid)]})).then(async res => {return await handle(res)})
 	}
 
-	client.favoriteRemove = async function(xuid) {
+	async favoriteRemove(xuid) {
 		if(!xuid) {throw 'XBL.IO ERROR: Must have include an xuid to remove from favorites.'}
 
 		return await fetch(`https://xbl.io/api/v2/friends/favorite/remove`, fetchData('post', {"xuids":[parseInt(xuid)]})).then(async res => {return await handle(res)})
 	}
 
-	client.fetchPresence = async function(xuids) {
+	async fetchPresence(xuids) {
 		if(typeof xuids !== 'array' && xuids !== undefined) {throw 'XUIDs for presence fetching must be either empty or an array.'}
 
 		if(xuids !== undefined) {
@@ -122,22 +130,24 @@ function Client() {
 		return await fetch(`https://xbl.io/api/v2${XUIDs ? XUIDs : ''}/presence`, fetchData()).then(async res => {return await handle(res)})
 	}
 
-	client.fetchConversation = async function(xuid) {
+	async fetchConverstaion(xuid) {
 		return await fetch(`https://xbl.io/api/v2/conversations${xuid ? `/${xuid}` : ''}`, fetchData()).then(async res => {return await handle(res)})
 	}
-	client.fetchConversations = async function(xuid) {return await client.fetchConversation(xuid)}
+	async fetchConversations(xuid) {return await this.fetchConversation(xuid)}
 
-	client.sendUserMessage = async function(xuid, message) {
+	async sendUserMessage(xuid, message) {
 		if(!xuid || !message) {throw 'XBL.IO ERROR: Must input XUID and message to send to user.'}
 
 		return await fetch(`https://xbl.io/api/v2/conversations`, fetchData('post', {"xuid":`${xuid}`, "message":message})).then(async res => {return await handle(res)})
 	}
-	client.sendGroupMessgae = async function(groupId, message) {
+
+	async sendGroupMessage(groupId, message) {
 		if(!groupId || !message) {throw 'XBL.IO ERROR: Must input Group ID and message to send to group.'}
 
 		return await fetch(`https://xbl.io/api/v2/group/send`, fetchData('post', {"groupId":`${groupId}`,"message":message}))
 	}
-	client.sendMessage = async function(UoG, ID, Message) {
+
+	async sendMessage(UoG, ID, Message) {
 		if(!UoG || !ID || !Message) {throw 'XBL.IO ERROR: Must input type of conversation (group/g or user/u), conversation id, and message.'}
 
 		UoG = UoG.toLowerCase()
@@ -161,7 +171,7 @@ function Client() {
 		return await fetch(url, fetchData('post', data)).then(async res => {return await handle(res)})
 	}
 
-	return client
-}
+	
+};
 
-module.exports = client
+module.exports = XBL_Client
