@@ -1,12 +1,12 @@
 {
   "name": "xbl.io",
-  "version": "1.4.2",
-  "description": "",
+  "version": "1.4.3",
+  "description": "An unofficial handler for accessing the xbl.io api.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "DerpDevs",
   "license": "ISC",
   "dependencies": {
     "fs-extra": "^10.0.0",
