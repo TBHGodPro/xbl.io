@@ -1,12 +1,11 @@
 const fs = require('fs-extra')
-const path = require('path')
 
-const functions = fs.readdirSync(path.resolve(__dirname, './functions')).filter(file => file.endsWith('.js'))
+const functions = fs.readdirSync(`${__dirname}/functions`).filter(file => file.endsWith('.js'))
 
 var funcExports = {}
 
 functions.forEach(func => {
-	funcExports[func.substr(0, func.length-3)] = require(path.resolve(__dirname, `./functions/${func}`))
+	funcExports[func.substr(0, func.length-3)] = require(`${__dirname}/functions/${func}`)
 })
 
 const dataExports = {

@@ -1,15 +1,14 @@
 const fs = require('fs-extra')
-const path = require('path')
 
-const folders = fs.readdirSync(path.resolve(__dirname, './')).filter(file => file !== 'node_modules' && !file.includes('.'))
+const folders = fs.readdirSync(`${__dirname}`).filter(file => file !== 'node_modules' && !file.includes('.'))
 
 var exports = {}
 
 folders.forEach(folder => {
 	if(folder === 'blend') {
-		exports = {...exports, ...require(path.resolve(__dirname, `./${folder}/index.js`))}
+		exports = {...exports, ...require(`${__dirname}/blend/index`)}
 	} else {
-		exports[folder] = require(path.resolve(__dirname, `./${folder}/index.js`))
+		exports[folder] = require(`${__dirname}/${folder}/index`)
 	}
 });
 
