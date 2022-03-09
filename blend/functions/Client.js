@@ -47,7 +47,9 @@ class XBL_Client {
 	constructor() {
 		this.#XAuth = null
 		this.account = {}
-		this.accounts = []
+		this.cache = {
+			accounts: {}
+		}
 	};
 
 	fetchData(method, body) {
@@ -71,9 +73,14 @@ class XBL_Client {
 			throw 'XBL.IO ERROR: Invalid API Key'
 		}
 
+		if(this.account !== {}) {
+			var oldAccount = this.account
+		} else {
+			var oldAccount;
+		}
 		this.account = account
 
-		return cb(callback, account)
+		return cb(callback, account, oldAccount)
 	};
 
 	async getAccount(xuid) {
@@ -85,14 +92,14 @@ class XBL_Client {
 		if(xuid === this.account.id || xuid === undefined) {
 			this.account = account
 		} else {
-			this.accounts = this.accounts.filter(acc => acc.id !== account.id)
-			
-			if(this.accounts.length >= 10) {
-				this.accounts.splice(-(this.accounts.length - 9), this.accounts.length - 9)
-				this.accounts.splice(0, 0, account)
-			} else {
-				this.accounts.splice(0, 0, account)
+			for(var I = 0; I < this.cache.accounts.length; I++) {
+				var key = Object.keys(this.cache.accounts)[I]
+				if(this.cache.accounts[key] === account) {
+					delete this.cache.accounts[key];
+				}
 			}
+			
+			this.cache.accounts[account.id] = account
 			
  		}
 		

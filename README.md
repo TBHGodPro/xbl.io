@@ -25,7 +25,7 @@ Note: For these examples, replace `API_KEY` and `NEW_API_KEY` with the actual ap
 ```JavaScript
 
 const XBL = require("xbl.io");
-var client = new 7XBL.Client();
+var client = new XBL.Client();
 
 
 
@@ -36,112 +36,124 @@ client.login(API_KEY, (account) => {
 OR
 
 await client.login(API_KEY)
-console.log(client.settings.Gamertag)
+console.log("Logged in as: " + account.settings.Gamertag + "!")
 ```
 
-WARNING: `client.login()` is async *(this is due to the fact that it must verify that the API Key is valid)* so it may not be instant *(though it is pretty quick)* unless you run it with an await before it in an async function. Though you can run a callback with a parameter which is your account.
+WARNING: `client.login()` is async *(this is due to the fact that it must verify that the API Key is valid)* so it may not be instant *(though it is pretty quick)* unless you run it with an await before it in an async function. Though you can run a callback with a parameter which is your account and another one which would be your oldAccount if you were logged in before.
 
 <br>
 
 You can easily login to another user by doing:
 
 ```JavaScript
-client.login(NEW_API_KEY, (account) => {
-	console.log(account.settings.Gamertag)
+client.login(NEW_API_KEY, (newAccount, oldAccount) => {
+	console.log("Logged out from: " + oldAccount.settings.Gamertag + " and logged in as: " + newAccount.settings.Gamertag + "!")
 })
 
 
 
 await client.login(NEW_API_KEY)
-console.log(client.settings.Gamertag)
+console.log("Logged in as: " + account.settings.Gamertag + "!")
 ```
 
 <br>
 
 ## Properties
 
+### cache
+```JavaScript
+// Object
+client.cache
+```
+The cache which stores all data recently fetched from the servers
+
+
+
+## Cache
+
 ### account
 ```JavaScript
 // Object
-client.account
+client.cache.account
 ```
-The most recent cache save of the client's account
+The most recent save of the client's account
 
 ### accounts
 ```JavaScript
-// Array<Object>
-client.accounts
+// Object<String:Object>
+client.cache.accounts
 ```
-The cache of all accounts recently fetched (saves up to 10 non-repetitive accounts not including the client's account with newer cached items first)
+The save of all accounts fetched (Saves non-repetitive objects with the user xuid as the key and the account object as the value)
+
 
 
 ## Methods
 
 ### getAccount 
 ```JavaScript
-await client.getAccount(optional:XUID);
+await client.getAccount(optional:String/Int/null:XUID);
 ```
 Grabs the account of the XUID specified, if no XUID is specified, uses the currently logged in account's XUID.
 
 ### getAccounts
 ```JavaScript
-await client.getAccounts(required:XUIDs)
+await client.getAccounts(required:Array<String/Int/Null>:XUIDs)
 ```
 Iterates throught the inputted `Array` and returns an array of the accounts of all the xuids inputted.
 
 ### friends 
 ```JavaScript
-await client.friends(optional:XUID);
+await client.friends(optional:String/Int:XUID);
 ```
 Grabs the accounts of all the friends of the account specified, if no account is specified, uses the currently logged in account.
 
 ### userFetch 
 ```JavaScript
-await client.userFetch(required:gamertag);
+await client.userFetch(required:String:gamertag);
 ```
 Grabs the account of the user specified.
 
 ### friendAdd *(Currently not working)*
 ```JavaScript
-await client.friendAdd(required:XUID);
+await client.friendAdd(required:String/Int:XUID);
 ```
 Adds a friend to your friends list.
 
 ### friendRemove *(Currently not working)*
 ```JavaScript
-await client.friendRemove(required:XUID);
+await client.friendRemove(required:String/Int:XUID);
 ```
 Removes a friend from your friends list.
 
 ### favoriteAdd *(Currently not working)*
 ```JavaScript
-await client.favoriteAdd(required:XUID);
+await client.favoriteAdd(required:String/Int:XUID);
 ```
 Adds a friend to your favorites.
 
 ### favoriteRemove *(Currently not working)*
 ```JavaScript
-await client.favoriteRemove(required:XUID);
+await client.favoriteRemove(required:String/Int:XUID);
 ```
 Removes a friend from your favorites while still keeping them in your friends list.
 
 ### fetchPresence
 ```JavaScript
-await client.fetchPresence(optional:XUIDs /* array */);
+await client.fetchPresence(optional:Array<String/Int>:XUIDs /* array */);
 ```
 Fetches the presences of all the XUIDs in the array (they must be friends of yours)	. If no array is inputted, it will fetch the presence of all your friends.
 
 ### fetchConversation/fetchConversations
 ```JavaScript
-await client.fetchConversation(optional:XUID);
+await client.fetchConversation(optional:String/Int:XUID);
 OR
-await client.fetchConversations(optional:XUID);
+await client.fetchConversations(optional:String/Int:XUID);
 ```
 Fetches the conversations between you and the user with the XUID. If no XUID is given, fetches all of your conversations.
 
 ### sendMessage *(UNTESTED)*
 ```JavaScript
-await client.sendMessage(required:(user, u, or user/u) or (group, g, or group/g), required:groupId or user XUID, required:message)
+await client.sendMessage(required:String:(user, u, or user/u) or (group, g, or group/g), required:String/Int:groupId or user XUID, required:String:message)
 ```
 Sends a message to the user or group specified.
 
