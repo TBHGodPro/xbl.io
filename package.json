@@ -1,6 +1,6 @@
 {
   "name": "xbl.io",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "An unofficial handler for accessing the xbl.io api.",
   "main": "index.js",
   "scripts": {

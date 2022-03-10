@@ -1,4 +1,9 @@
-const fetch = require('node-fetch')
+const directFetch = require('node-fetch')
+
+const fetch = async(url, options, reOrErr) => {
+	var data = await handle(await directFetch(url, options), reOrErr)
+	return data
+};
 
 const cb = (callback, p1, p2, p3) => {
 	if(callback === undefined) return p1
@@ -31,6 +36,9 @@ const handle = async (res, returnInsteadOfError) => {
 			returnData.settings = {}
 
 			for(var i = 0;i<settings.length;i++) {
+				if(settings[i].id === 'PreferredColor') {
+					settings[i].value = await directFetch(settings[i].value).then(res => res.json())
+				}
 				returnData.settings[settings[i].id] = settings[i].value
 			}
 			
@@ -66,7 +74,7 @@ class XBL_Client {
 		var XAuthStore = this.#XAuth
 		this.#XAuth = XAuth
 
-		var account = await fetch(`https://xbl.io/api/v2/account`, this.fetchData()).then(async res => {return await handle(res, true)})
+		var account = await fetch(`https://xbl.io/api/v2/account`, this.fetchData(), true)
 		
 		if(account === 'Invalid API Key') {
 			this.XAuth = XAuthStore
@@ -87,7 +95,7 @@ class XBL_Client {
 
 		if(typeof xuid !== typeof '' && typeof xuid !== typeof 123 && xuid !== undefined && xuid !== null) {throw 'XBL.IO ERROR: Incorrect input type for `getAccount()`, must input a value with type `string`, `integer`, `undefined`, or `null`\nInputted ' + xuid + ', which is a type ' + typeof xuid}
 
-		var account = await fetch(`https://xbl.io/api/v2/account${xuid ? `/${xuid}` : ''}`, this.fetchData()).then(async res => {return await handle(res)})
+		var account = await fetch(`https://xbl.io/api/v2/account${xuid ? `/${xuid}` : ''}`, this.fetchData())
 		
 		if(xuid === this.account.id || xuid === undefined) {
 			this.account = account
@@ -117,36 +125,36 @@ class XBL_Client {
 	}
 
 	async friends(xuid) {
-		return await fetch(`https://xbl.io/api/v2/friends${xuid ?  `?xuid=${xuid}` : ''}`, fetchData()).then(async res => {return await handle(res)})
+		return await fetch(`https://xbl.io/api/v2/friends${xuid ?  `?xuid=${xuid}` : ''}`, this.fetchData())
 	}
 
 	async userFetch(gt) {
 		if(!gt) {throw 'XBL.IO ERROR: Must have GamerTag input on User Search'}
-		return await fetch(`https://xbl.io/api/v2/friends/search?gt=${gt}`, fetchData()).then(async res => {return await handle(res)})
+		return await fetch(`https://xbl.io/api/v2/friends/search?gt=${gt}`, this.fetchData())
 	}
 
 	async friendAdd(xuid) {
 		if(!xuid) {throw 'XBL.IO ERROR: Must include a User XUID to add a friend.'}
 
-		return await fetch(`https://xbl.io/api/v2/friends/add/${xuid}`, fetchData()).then(async res => {return await handle(res)})
+		return await fetch(`https://xbl.io/api/v2/friends/add/${xuid}`, this.fetchData())
 	}
 
 	async friendRemove(xuid) {
 		if(!xuid) {throw 'XBL.IO ERROR: Must include a Friend XUID to remove a friend.'}
 
-		return await fetch(`https://xbl.io/api/v2/friends/remove/${xuid}`, fetchData()).then(async res => {return await handle(res)})
+		return await fetch(`https://xbl.io/api/v2/friends/remove/${xuid}`, this.fetchData())
 	}
 
 	async favoriteAdd(xuid) {
 		if(!xuid) {throw 'XBL.IO ERROR: Must have include an xuid to add as a favorite.'}
 
-		return await fetch(`https://xbl.io/api/v2/friends/favorite`, fetchData('post', {"xuids":[parseInt(xuid)]})).then(async res => {return await handle(res)})
+		return await fetch(`https://xbl.io/api/v2/friends/favorite`, this.fetchData('post', {"xuids":[parseInt(xuid)]}))
 	}
 
 	async favoriteRemove(xuid) {
 		if(!xuid) {throw 'XBL.IO ERROR: Must have include an xuid to remove from favorites.'}
 
-		return await fetch(`https://xbl.io/api/v2/friends/favorite/remove`, fetchData('post', {"xuids":[parseInt(xuid)]})).then(async res => {return await handle(res)})
+		return await fetch(`https://xbl.io/api/v2/friends/favorite/remove`, this.fetchData('post', {"xuids":[parseInt(xuid)]}))
 	}
 
 	async fetchPresence(xuids) {
@@ -160,24 +168,24 @@ class XBL_Client {
 			XUIDs = `/${XUIDs.substr(1)}`
 		}
 
-		return await fetch(`https://xbl.io/api/v2${XUIDs ? XUIDs : ''}/presence`, fetchData()).then(async res => {return await handle(res)})
+		return await fetch(`https://xbl.io/api/v2${XUIDs ? XUIDs : ''}/presence`, this.fetchData())
 	}
 
 	async fetchConverstaion(xuid) {
-		return await fetch(`https://xbl.io/api/v2/conversations${xuid ? `/${xuid}` : ''}`, fetchData()).then(async res => {return await handle(res)})
+		return await fetch(`https://xbl.io/api/v2/conversations${xuid ? `/${xuid}` : ''}`, this.fetchData())
 	}
 	async fetchConversations(xuid) {return await this.fetchConversation(xuid)}
 
 	async sendUserMessage(xuid, message) {
 		if(!xuid || !message) {throw 'XBL.IO ERROR: Must input XUID and message to send to user.'}
 
-		return await fetch(`https://xbl.io/api/v2/conversations`, fetchData('post', {"xuid":`${xuid}`, "message":message})).then(async res => {return await handle(res)})
+		return await fetch(`https://xbl.io/api/v2/conversations`, this.fetchData('post', {"xuid":`${xuid}`, "message":message}))
 	}
 
 	async sendGroupMessage(groupId, message) {
 		if(!groupId || !message) {throw 'XBL.IO ERROR: Must input Group ID and message to send to group.'}
 
-		return await fetch(`https://xbl.io/api/v2/group/send`, fetchData('post', {"groupId":`${groupId}`,"message":message}))
+		return await fetch(`https://xbl.io/api/v2/group/send`, this.fetchData('post', {"groupId":`${groupId}`,"message":message}))
 	}
 
 	async sendMessage(UoG, ID, Message) {
@@ -201,7 +209,7 @@ class XBL_Client {
 
 		if(url === undefined) {throw 'XBL.IO ERROR: Invalid message type. (Not group/g or user/u).'}
 
-		return await fetch(url, fetchData('post', data)).then(async res => {return await handle(res)})
+		return await fetch(url, this.fetchData('post', data))
 	}
 
 	
