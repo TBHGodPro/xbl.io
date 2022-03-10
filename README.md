@@ -89,6 +89,12 @@ The save of all accounts fetched (Saves non-repetitive objects with the user xui
 
 ## Methods
 
+### logout
+```JavaScript
+client.logout(optional:function:callback);
+```
+Logs out of the current account and calls callback with one parameter being the account that was logged out of.
+
 ### getAccount 
 ```JavaScript
 await client.getAccount(optional:String/Int/null:XUID);
@@ -97,7 +103,7 @@ Grabs the account of the XUID specified, if no XUID is specified, uses the curre
 
 ### getAccounts
 ```JavaScript
-await client.getAccounts(required:Array<String/Int/Null>:XUIDs)
+await client.getAccounts(required:Array<String/Int/Null>:XUIDs);
 ```
 Iterates throught the inputted `Array` and returns an array of the accounts of all the xuids inputted.
 
@@ -153,7 +159,7 @@ Fetches the conversations between you and the user with the XUID. If no XUID is 
 
 ### sendMessage *(UNTESTED)*
 ```JavaScript
-await client.sendMessage(required:String:(user, u, or user/u) or (group, g, or group/g), required:String/Int:groupId or user XUID, required:String:message)
+await client.sendMessage(required:String:(user, u, or user/u) or (group, g, or group/g), required:String/Int:groupId or user XUID, required:String:message);
 ```
 Sends a message to the user or group specified.
 

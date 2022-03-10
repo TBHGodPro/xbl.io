@@ -60,6 +60,14 @@ class XBL_Client {
 		}
 	};
 
+	#reset = () => {
+		this.#XAuth = null
+		this.account = {}
+		this.cache = {
+			accounts: {}
+		}
+	}
+
 	fetchData(method, body) {
 		return {
 			method: method ? method.toUpperCase() : 'GET',
@@ -89,7 +97,12 @@ class XBL_Client {
 		this.account = account
 
 		return cb(callback, account, oldAccount)
-	};
+	};	
+
+	logout(callback) {
+		cb(callback, this.account)
+		this.#reset()
+	}
 
 	async getAccount(xuid) {
 
