@@ -65,25 +65,25 @@ console.log("Logged in as: " + account.settings.Gamertag + "!")
 // Object
 client.cache
 ```
-The cache which stores all data recently fetched from the servers
-
-
-
-## Cache
+The cache which stores all data recently fetched from the servers.
 
 ### account
 ```JavaScript
 // Object
-client.cache.account
+client.account
 ```
-The most recent save of the client's account
+The most recent save of the client's account.
+
+
+
+## Cache
 
 ### accounts
 ```JavaScript
 // Object<String:Object>
 client.cache.accounts
 ```
-The save of all accounts fetched (Saves non-repetitive objects with the user xuid as the key and the account object as the value)
+The save of all accounts fetched (Saves non-repetitive objects with the user xuid as the key and the account object as the value).
 
 
 

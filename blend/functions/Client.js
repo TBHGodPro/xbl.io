@@ -1,8 +1,7 @@
 const directFetch = require('node-fetch')
 
 const fetch = async(url, options, reOrErr) => {
-	var data = await handle(await directFetch(url, options), reOrErr)
-	return data
+	return await handle(await directFetch(url, options), reOrErr)
 };
 
 const cb = (callback, p1, p2, p3) => {
